@@ -1,0 +1,47 @@
+from fastapi import FastAPI, UploadFile, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+import pandas as pd
+import uvicorn
+
+app = FastAPI()
+
+templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.get("/", response_class=HTMLResponse)
+def upload_page(request: Request):
+    return templates.TemplateResponse("upload.html", {"request": request})
+
+
+@app.post("/upload", response_class=HTMLResponse)
+async def upload_excel(request: Request, file: UploadFile):
+    df = pd.read_excel(file.file)
+
+    df.columns = [c.lower().strip() for c in df.columns]
+
+    required = {"descrizione", "quantita", "prezzo_unitario"}
+    if not required.issubset(set(df.columns)):
+        return HTMLResponse(
+            "<h2>Errore: il file deve contenere le colonne: descrizione, quantita, prezzo_unitario</h2>"
+        )
+
+    df["totale"] = df["quantita"] * df["prezzo_unitario"]
+    totale_generale = df["totale"].sum()
+
+    rows = df.to_dict(orient="records")
+
+    return templates.TemplateResponse(
+        "result.html",
+        {
+            "request": request,
+            "rows": rows,
+            "totale_generale": round(totale_generale, 2),
+        },
+    )
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", reload=True)

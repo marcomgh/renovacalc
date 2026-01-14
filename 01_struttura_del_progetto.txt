@@ -1,0 +1,7 @@
+renovacalc/
+  main.py
+  templates/
+    upload.html
+    result.html
+  static/
+    style.css

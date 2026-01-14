@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Risultato computo</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Risultato computo</h1>
+
+    <table>
+        <tr>
+            <th>Descrizione</th>
+            <th>Quantità</th>
+            <th>Prezzo Unitario</th>
+            <th>Totale</th>
+        </tr>
+
+        {% for r in rows %}
+        <tr>
+            <td>{{ r.descrizione }}</td>
+            <td>{{ r.quantita }}</td>
+            <td>{{ r.prezzo_unitario }}</td>
+            <td>{{ r.totale }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Totale generale: {{ totale_generale }} €</h2>
+
+    <a href="/">Carica un altro file</a>
+</body>
+</html>
